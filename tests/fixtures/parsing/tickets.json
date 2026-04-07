@@ -1,0 +1,10 @@
+[
+  {
+    "ticket_id": "4001",
+    "subject": "Billing issue",
+    "message": "Customer was charged twice.",
+    "status": "pending",
+    "priority": "urgent",
+    "customer_id": "cust-20"
+  }
+]

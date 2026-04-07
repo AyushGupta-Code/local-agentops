@@ -1,0 +1,28 @@
+{
+  "document_id": "demo-doc-1",
+  "source_type": "document",
+  "title": "Password Reset Guide",
+  "plain_text": "Reset your password from the login page. If the email is missing, check the spam folder.",
+  "summary": null,
+  "language": "en",
+  "sections": [
+    {
+      "heading": "Document Body",
+      "text": "Reset your password from the login page. If the email is missing, check the spam folder.",
+      "order": 0,
+      "start_offset": 0,
+      "end_offset": 88
+    }
+  ],
+  "source_uri": "kb://password-reset",
+  "metadata": {
+    "source_file": "kb://password-reset",
+    "row_number": null,
+    "parser_mime_type": "text/plain",
+    "section_headings": [
+      "Document Body"
+    ]
+  },
+  "created_at": null,
+  "updated_at": null
+}

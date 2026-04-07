@@ -1,0 +1,3 @@
+Local AgentOps is a local-first platform.
+
+It normalizes text before chunking.

@@ -1,0 +1,49 @@
+{
+  "records": [
+    {
+      "chunk_id": "doc-1:0",
+      "document_id": "doc-1",
+      "text": "Reset your password from the login page using the email link.",
+      "metadata": {
+        "source_type": "document",
+        "title": "Password Reset Guide",
+        "source_uri": "kb://password-reset",
+        "section_heading": "Reset Steps",
+        "chunk_index": 0,
+        "tags": ["auth", "account"],
+        "archived": false,
+        "locator": "Section: Reset Steps"
+      }
+    },
+    {
+      "chunk_id": "doc-2:0",
+      "document_id": "doc-2",
+      "text": "Download invoices and billing statements from the account billing portal.",
+      "metadata": {
+        "source_type": "document",
+        "title": "Billing Portal Guide",
+        "source_uri": "kb://billing-portal",
+        "section_heading": "Invoices",
+        "chunk_index": 0,
+        "tags": ["billing", "account"],
+        "archived": false,
+        "locator": "Section: Invoices"
+      }
+    },
+    {
+      "chunk_id": "ticket-9:0",
+      "document_id": "ticket-9",
+      "text": "Agents resolved a customer issue by clearing the browser cache before signing in.",
+      "metadata": {
+        "source_type": "support_ticket",
+        "title": "Support Ticket 9",
+        "source_uri": "ticket://9",
+        "section_heading": "Resolution",
+        "chunk_index": 0,
+        "tags": ["support", "auth"],
+        "archived": true,
+        "locator": "Section: Resolution"
+      }
+    }
+  ]
+}

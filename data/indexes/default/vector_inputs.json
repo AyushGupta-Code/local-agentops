@@ -1,0 +1,25 @@
+{
+  "records": [
+    {
+      "chunk_id": "demo-doc-1:0:0:88",
+      "document_id": "demo-doc-1",
+      "text": "Reset your password from the login page. If the email is missing, check the spam folder.",
+      "metadata": {
+        "source_file": "kb://password-reset",
+        "page_numbers": [],
+        "row_range": null,
+        "section_title": "Document Body",
+        "char_range": [
+          0,
+          88
+        ],
+        "chunking_strategy": "section_based",
+        "source_type": "document",
+        "chunk_index": 0,
+        "char_start": 0,
+        "char_end": 88,
+        "section_heading": "Document Body"
+      }
+    }
+  ]
+}

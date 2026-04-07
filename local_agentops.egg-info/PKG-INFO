@@ -1,3 +1,28 @@
+Metadata-Version: 2.4
+Name: local-agentops
+Version: 0.1.0
+Summary: Local-first AI Knowledge Ops platform scaffold.
+Author: Ayush Gupta
+License: MIT
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: fastapi<1.0.0,>=0.115.0
+Requires-Dist: uvicorn[standard]<1.0.0,>=0.30.0
+Requires-Dist: pydantic<3.0.0,>=2.8.0
+Requires-Dist: pydantic-settings<3.0.0,>=2.4.0
+Requires-Dist: pypdf<6.0.0,>=5.1.0
+Requires-Dist: python-dotenv<2.0.0,>=1.0.1
+Requires-Dist: rank-bm25<1.0.0,>=0.2.2
+Requires-Dist: sentence-transformers<4.0.0,>=3.0.0
+Requires-Dist: faiss-cpu<2.0.0,>=1.8.0
+Provides-Extra: dev
+Requires-Dist: pytest<9.0.0,>=8.3.0; extra == "dev"
+Requires-Dist: pytest-cov<6.0.0,>=5.0.0; extra == "dev"
+Requires-Dist: ruff<1.0.0,>=0.6.0; extra == "dev"
+Requires-Dist: mypy<2.0.0,>=1.11.0; extra == "dev"
+Dynamic: license-file
+
 # local-agentops
 
 Local-first AI Knowledge Ops platform for private documents and support-ticket style data. The project ingests local sources, parses and chunks them, builds retrieval indexes, runs grounded local question answering with citations, and exposes both a FastAPI API and a minimal demo page. The codebase is organized as a modular backend so each pipeline stage can be inspected, tested, and extended independently.
@@ -167,10 +192,9 @@ local-agentops/
 
 Local model note:
 
-- The current code includes a real Ollama backend adapter through `app.generation.backends.OllamaLocalModelBackend`.
-- If `LOCAL_LLM_PROVIDER=ollama`, the API will attempt a live HTTP call to the configured local Ollama server.
-- If the configured provider is unsupported or you intentionally choose a non-implemented provider value, the generation layer falls back to an explicit deterministic backend and reports that fallback state in API trace metadata.
-- You do **not** need Ollama running just to start the API, inspect retrieval, or use the demo page, but real grounded answer generation requires a reachable Ollama server.
+- The config exposes `LOCAL_LLM_PROVIDER` and `LOCAL_LLM_MODEL` values (for example `ollama` and `llama3.1`), but the current code does **not** yet include a concrete live Ollama/llama.cpp/vLLM backend adapter.
+- Today, `app.generation.backends.LocalModelService` falls back to `StaticJSONLocalModelBackend` unless you inject a real backend in code or tests.
+- That means you do **not** need Ollama running just to start the API, run the demo page, or execute the current test suite. A real local model backend is still a gap in the implementation.
 
 ## Installation
 
@@ -241,10 +265,8 @@ Important environment variables used by the code:
 | `PROCESSED_DATA_DIR` | `processed` | Parsed documents and chunk output directory. |
 | `INDEX_DATA_DIR` | `indexes` | Retrieval/index manifest directory. |
 | `EVAL_DATA_DIR` | `eval` | Evaluation output directory. |
-| `LOCAL_LLM_PROVIDER` | `ollama` | Local generation backend provider. `ollama` is supported directly. Unsupported values fall back explicitly. |
-| `LOCAL_LLM_MODEL` | `llama3.1` | Local model name sent to the configured generation backend. |
-| `LOCAL_LLM_BASE_URL` | `http://127.0.0.1:11434` | Base URL for the local Ollama server. |
-| `LOCAL_LLM_TIMEOUT_SECONDS` | `60` | Timeout used for local model HTTP requests. |
+| `LOCAL_LLM_PROVIDER` | `ollama` | Logical local model provider label. Configured but not yet wired to a live backend. |
+| `LOCAL_LLM_MODEL` | `llama3.1` | Logical local model name recorded in settings and fallback backend names. |
 | `LOCAL_EMBEDDING_MODEL` | `bge-small-en-v1.5` | Intended embedding model name for future live embedding integrations. |
 | `DEFAULT_TOP_K` | `5` | Default retrieval depth. |
 | `DEFAULT_CHUNK_SIZE` | `800` | Default chunk size used by `ChunkingService`. |
@@ -583,29 +605,9 @@ cp .env.example .env
 
 If needed, clear cached settings by restarting the Python process or test run.
 
-### Missing or unreachable local model service
+### Missing local model service
 
-The repository supports a real Ollama backend, but the local model service must be running and reachable. If Ollama is not running or the configured provider is unsupported:
-
-- retrieval still works
-- the API can still start
-- the demo page still works
-- generation either fails with a visible error or uses an explicit fallback path, depending on your configured provider
-
-Recommended Ollama setup:
-
-```bash
-ollama serve
-ollama pull llama3.1
-```
-
-And in `.env`:
-
-```bash
-LOCAL_LLM_PROVIDER=ollama
-LOCAL_LLM_MODEL=llama3.1
-LOCAL_LLM_BASE_URL=http://127.0.0.1:11434
-```
+The current code does not yet ship a real Ollama/llama.cpp/vLLM backend adapter. If you start the API without injecting a custom backend, generation falls back to a static backend and may not produce realistic grounded answers.
 
 ### `Requested collection has not been indexed yet`
 
@@ -636,17 +638,13 @@ ls data/indexes/default
 
 ### API starts but answers are not very useful
 
-Check the query response `trace_metadata` first:
-
-- If `generation_fallback_used` is `true`, you are not using a real local generation backend yet.
-- If `generation_backend_kind` is `ollama` and `generation_error` is non-null, the API reached the real backend path but the local model call failed.
-- If retrieval works but generation is weak, inspect the retrieved evidence first with `POST /api/retrieve`, then inspect prompt/generation quality.
+That is expected in the current state if you have not wired a real local model backend. Retrieval and citation plumbing are in place, but the default generation backend is only a deterministic fallback.
 
 ## Known Gaps / TODOs
 
-- Ollama is the only live local generation backend currently implemented. `llama.cpp`, `vLLM`, and other providers still need concrete adapters.
-- Retrieval currently uses a local manifest-based in-memory vector flow and lexical scoring; there is no persisted FAISS build/load path yet.
-- Reranking is still a transparent weighted normalized merge of vector and lexical candidates, not a separate learned reranker.
-- The embedding path is still deterministic and local-first rather than using a stronger model-backed embedding service.
+- The project config includes `LOCAL_LLM_PROVIDER` and `LOCAL_LLM_MODEL`, but there is not yet a real provider adapter for Ollama, llama.cpp, vLLM, or another live local model service.
+- Retrieval currently uses a local manifest-based in-memory vector flow and lexical scoring; there is no persisted FAISS index build/load path yet.
+- “Reranking” is currently a simple weighted normalized merge of vector and lexical candidates, not a separate learned reranker.
 - There is no dedicated ingestion CLI yet; ingestion is driven primarily through the API.
-- Some benchmark/demo scripts intentionally use deterministic static backends so the pipeline remains testable without an external local model service.
+- Some benchmark/demo scripts use deterministic static backends to keep the pipeline inspectable and runnable without external services.
+- The README and API describe the real code on disk today, but some modules are still first-pass infrastructure rather than production-grade implementations.

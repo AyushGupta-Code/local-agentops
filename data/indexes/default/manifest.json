@@ -1,0 +1,9 @@
+{
+  "collection_name": "default",
+  "chunk_count": 1,
+  "include_lexical": true,
+  "vector_backend": "LocalManifestVectorBackend",
+  "source_documents": [
+    "demo-doc-1"
+  ]
+}
